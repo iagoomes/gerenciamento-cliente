@@ -119,3 +119,37 @@ Através da contrato podemos utilizar o [plugin da openapi](https://openapi-gene
 
 </project>
 ```
+
+#### Criando nosso contrato
+Para criar nosso contrato, vamos utilizar o [Swagger Editor](https://swagger.io/tools/swagger-editor/).
+Com ele conseguimos criar e já validar o swagger gerado :sunglasses:.
+
+Nosso contrato será no padrão YAML, tipo de arquivo recomendado pela openapi.
+Para mais informações verificar [documentação de especificação](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#info-object)
+
+Vamos iniciar nosso contrato com as tags obrigatórias
+```yaml
+openapi: 3.0.3
+info:
+  title: Gerenciamento de Clientes
+  description: API de gerenciamento de Clientes
+  version: 1.0.0
+servers:
+  - url: app-iagoomes/v1
+    description: Servidor de desenvolvimento
+tags:
+  - name: cliente
+paths:
+  /clientes:
+    get:
+      tags:
+        - cliente
+      summary: Lista todos os clientes
+      responses:
+        '200':
+          description: Lista de Clientes
+```
+
+O contrato acima aborda apenas as tags principais, a fim de exemplificar o scopo inicial seguindo boas praticas.
+
+Vamos implementar o método POST e deixar o GET de canto por alguns momentos.
