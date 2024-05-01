@@ -151,5 +151,35 @@ paths:
 ```
 
 O contrato acima aborda apenas as tags principais, a fim de exemplificar o scopo inicial seguindo boas praticas.
+Vamos implementar o método POST e deixar o GET de canto por enquanto.
 
-Vamos implementar o método POST e deixar o GET de canto por alguns momentos.
+Optei por implemetar o verbo POST agora, porque vamos criar DTOs de entrada e saida com isso conseguimos aproveitar esses DTOs em outros verbos HTTP.
+```yaml
+paths:
+  /clientes:
+    post:
+      tags:
+        - cliente
+      summary: Cadastrar cliente
+      operationId: criaCliente
+      requestBody:
+        description: Dados iniciais do cliente
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+      responses:
+        201:
+         description: Account not found
+          content:
+            application/json:
+              schema:
+```
+
+Veja que a estrutura acima é muito similar a estrutura que já criamos para o verbo GET.
+Incluimos duas tags novas **operationId** e **requestBody**, a nivel de estruturamente do contrato o operationId não é tão importante porem quando os codigos forem gerados ele será o nome do nosso método na nossa controller, já o resquestBody será nosso objeto de entrada passado pelo usuario.
+
+#### $ref
+Essa sintaxe é utilizada para acessar definições do nosso proprio contrato, exemplo: **$ref: '#/components/schemas/ClienteRequest'**.
+Nese exemplo estamos acessando um objeto criado em **/components/schemas** que por sua vez, esse objeto foi criado para representar nosso DTO de entrada. O mesmo vale para nosso DTO de resposta.
+
