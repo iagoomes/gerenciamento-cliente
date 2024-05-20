@@ -13,8 +13,8 @@ Através da contrato podemos utilizar o [plugin da openapi](https://openapi-gene
 
 
 
-## Coda Comigo
-#### Framework & Bibliotecas
+# Coda Comigo
+### Framework & Bibliotecas
 1. [Spring Boot 3+](https://spring.io/projects/spring-boot)
 2. [Maven](https://maven.apache.org/)
 3. [Java 21](https://www.oracle.com/br/java/technologies/downloads/#java21)
@@ -23,7 +23,7 @@ Através da contrato podemos utilizar o [plugin da openapi](https://openapi-gene
 6. [Openapi](https://spec.openapis.org/oas/latest.html#openapi-document)
 
 
-#### pom.xml inicial
+### pom.xml inicial
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -120,14 +120,14 @@ Através da contrato podemos utilizar o [plugin da openapi](https://openapi-gene
 </project>
 ```
 
-#### Criando nosso contrato
+### Criando nosso contrato
 Para criar nosso contrato, vamos utilizar o [Swagger Editor](https://swagger.io/tools/swagger-editor/).
 Com ele conseguimos criar e já validar o swagger gerado :sunglasses:.
 
 Nosso contrato será no padrão YAML, tipo de arquivo recomendado pela openapi.
 Para mais informações verificar [documentação de especificação](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#info-object)
 
-Vamos iniciar nosso contrato com as tags obrigatórias
+**Vamos iniciar nosso contrato com as tags obrigatórias**
 ```yaml
 openapi: 3.0.3
 info:
@@ -149,11 +149,13 @@ paths:
         '200':
           description: Lista de Clientes
 ```
-
-O contrato acima aborda apenas as tags principais, a fim de exemplificar o scopo inicial seguindo boas praticas.
+###### Explicando o YAML
+O contrato acima aborda apenas as tags principais, a fim de exemplificar o scopo inicial seguindo as boas práticas.
 Vamos implementar o método POST e deixar o GET de canto por enquanto.
-
 Optei por implemetar o verbo POST agora, porque vamos criar DTOs de entrada e saida com isso conseguimos aproveitar esses DTOs em outros verbos HTTP.
+
+
+#### POST
 ```yaml
 paths:
   /clientes:
@@ -163,23 +165,79 @@ paths:
       summary: Cadastrar cliente
       operationId: criaCliente
       requestBody:
-        description: Dados iniciais do cliente
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ClienteRequest'
+        $ref: '#/components/requestBodies/CriaCliente'
       responses:
         201:
-         description: Account not found
+          description: Cliente criado com sucesso
           content:
-            application/json:
+            applcation/json:
               schema:
+                $ref: '#/components/responses/CriaClienteCriado'
 ```
-
+###### Explicando o YAML
 Veja que a estrutura acima é muito similar a estrutura que já criamos para o verbo GET.
 Incluimos duas tags novas **operationId** e **requestBody**, a nivel de estruturamente do contrato o operationId não é tão importante porem quando os codigos forem gerados ele será o nome do nosso método na nossa controller, já o resquestBody será nosso objeto de entrada passado pelo usuario.
 
-#### $ref
-Essa sintaxe é utilizada para acessar definições do nosso proprio contrato, exemplo: **$ref: '#/components/schemas/ClienteRequest'**.
+**$ref**
+Essa sintaxe é utilizada para acessar definições do nosso proprio contrato, exemplo: **$ref: '#/components/schemas/CriaCliente'**.
 Nese exemplo estamos acessando um objeto criado em **/components/schemas** que por sua vez, esse objeto foi criado para representar nosso DTO de entrada. O mesmo vale para nosso DTO de resposta.
 
+### Components: requestBodies: - CriaCliente
+Vamos mostrar como criar os objetos que foram mencionados na tag **$ref**.
+Criar os objetos nas tags(requestBodies, responses, schemas, etc.) dentro de /components é extremamente importante pois trás legibilidade e reutilização de objetos.
+
+Vamos iniciar com o nosso objeto de entrada da requisição.
+```yaml
+components:
+  requestBodies:
+    CriaCliente:
+      description: DTO para criar cliente
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CriaClienteType'
+          examples:
+            201-Created:
+              summary: Criado com sucesso
+              value:
+                nome: Pedro Moedas
+                idade: 20
+                cpf: 747.441.100-88
+            500-InternalServerError:
+              summary: Internal Server Error
+              value:
+                nome: Petter1
+                idade: 30
+                cpf: 354.938.380-01
+```
+
+###### Explicando o YAML
+Este componente define o DTO (Data Transfer Object) para a criação de um cliente na API. Ele é utilizado no corpo da requisição HTTP ao criar um novo cliente.
+
+### Estrutura do Conteúdo
+
+- **application/json**: O conteúdo da requisição é do tipo JSON.
+  - **schema**: Referencia o esquema `CriaClienteType` definido em `#/components/schemas/CriaClienteType`.
+  - **examples**: Exemplos de possíveis conteúdos da requisição para diferentes situações:
+  
+    1. **201-Created**
+       - **Resumo**: Criado com sucesso
+       - **Exemplo de Valor**:
+         ```json
+         {
+           "nome": "Pedro Moedas",
+           "idade": 20,
+           "cpf": "747.441.100-88"
+         }
+         ```
+
+    2. **500-InternalServerError**
+       - **Resumo**: Internal Server Error
+       - **Exemplo de Valor**:
+         ```json
+         {
+           "nome": "Petter1",
+           "idade": 30,
+           "cpf": "354.938.380-01"
+         }
+         ```
