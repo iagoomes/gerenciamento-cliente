@@ -213,13 +213,9 @@ components:
 
 ###### Explicando o YAML
 Este componente define o DTO (Data Transfer Object) para a criação de um cliente na API. Ele é utilizado no corpo da requisição HTTP ao criar um novo cliente.
-
-### Estrutura do Conteúdo
-
 - **application/json**: O conteúdo da requisição é do tipo JSON.
-  - **schema**: Referencia o esquema `CriaClienteType` definido em `#/components/schemas/CriaClienteType`.
-  - **examples**: Exemplos de possíveis conteúdos da requisição para diferentes situações:
-  
+- **schema**: Referencia o esquema `CriaClienteType` definido em `#/components/schemas/CriaClienteType`.
+- **examples**: Exemplos de possíveis conteúdos da requisição para diferentes situações:
     1. **201-Created**
        - **Resumo**: Criado com sucesso
        - **Exemplo de Valor**:
@@ -241,3 +237,89 @@ Este componente define o DTO (Data Transfer Object) para a criação de um clien
            "cpf": "354.938.380-01"
          }
          ```
+### Construção do objeto CriaClienteType e suas composições
+#### CriaClienteType
+```yaml
+  schemas:  
+    CriaClienteType:
+      allOf:
+        - $ref: '#/components/schemas/Cliente'
+        - required:
+          - nome
+          - idade
+          - cpf
+```
+
+#### Cliente
+Objeto está dentro **schemas**
+```yaml
+    Cliente:
+      description: Todos os dados
+      allOf:
+        - $ref: '#/components/schemas/ClienteBase'
+        - type: object
+          properties:
+            idade:
+              $ref: '#/components/schemas/ClienteIdadeType'
+        - $ref: '#/components/schemas/ClienteStatus' 
+```
+
+
+#### ClienteBase & ClienteIdadeType & ClienteStatus
+Objetos estão dentro de **schemas**
+```yaml
+    ClienteBase:
+      description: Dados model
+      type: object
+      properties:
+        id:
+          allOf:
+            - $ref: '#/components/schemas/ClienteIdType'
+            - readOnly: true
+        nome:
+          description: Nome do cliente
+          type: string
+          minLength: 1
+          maxLength: 100
+        cpf:
+          allOf:
+            - $ref: '#/components/schemas/CPFType'
+
+    ClienteIdadeType:
+      description: Idade do cliente
+      type: integer
+      minimum: 0
+      maxLength: 3
+      format: int32
+
+    ClienteStatus:
+      description: Status do Cliente
+      type: object
+      properties:
+        status:
+          type: string
+          readOnly: true
+          enum:
+            - ativo
+            - desativado
+```
+
+Objetos abaixo são utilizados no objeto **ClienteBase**
+Objeto está dentro **schemas**
+```yaml
+    ClienteIdType:
+      description: ID unico de Cliente
+      type: integer
+      minimum: 1
+      maxLength: 7
+      format: int32
+
+    CPFType:
+      type: string
+      description: A Brazilian CPF number
+      example: '123.456.789-09'
+      pattern: '^\d{3}\.\d{3}\.\d{3}-\d{2}$'
+```
+
+
+Com isso, concluímos o método POST. Embora inicialmente possa parecer complexo, ele nos proporciona uma ótima reutilização.
