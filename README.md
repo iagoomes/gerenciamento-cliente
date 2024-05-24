@@ -316,7 +316,7 @@ Objeto está dentro **schemas**
 
     CPFType:
       type: string
-      description: A Brazilian CPF number
+      description: Numero de CPF
       example: '123.456.789-09'
       pattern: '^\d{3}\.\d{3}\.\d{3}-\d{2}$'
 ```
